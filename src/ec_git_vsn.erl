@@ -24,7 +24,7 @@
 %%%===================================================================
 %% This should be opaque, but that kills dialyzer so for now we export it
 %% however you should not rely on the internal representation here
--type t() :: {}.
+-type t() :: list().
 
 %%%===================================================================
 %%% API
@@ -32,11 +32,13 @@
 
 -spec new() -> t().
 new() ->
-    {}.
+    "*".
 
 -spec vsn(t()) -> {ok, string()} | {error, Reason::any()}.
-vsn(_Data) ->
-    Result = do_cmd("git describe --tags --always"),
+vsn([]) ->
+    vsn("*");
+vsn(Glob) ->
+    Result = do_cmd("git describe --tags --always --match '" ++ Glob ++ "'"),
     case re:split(Result, "-") of
         [Vsn, Count, RefTag] ->
             erlang:iolist_to_binary([strip_leading_v(Vsn),
