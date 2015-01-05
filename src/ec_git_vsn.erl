@@ -41,17 +41,17 @@ vsn(Glob) ->
     Result = do_cmd("git describe --tags --always --match '" ++ Glob ++ "'"),
     case re:split(Result, "-") of
         [Vsn, Count, RefTag] ->
-            erlang:iolist_to_binary([strip_leading_v(Vsn),
+            {ok, erlang:iolist_to_binary([strip_leading_v(Vsn),
                                      <<"+build.">>,
                                      Count,
                                      <<".ref.">>,
-                                     RefTag]);
+                                     RefTag])};
         [VsnOrRefTag] ->
             case re:run(VsnOrRefTag, "^[0-9a-fA-F]+$") of
                 {match, _} ->
-                    find_vsn_from_start_of_branch(VsnOrRefTag);
+                    {ok, find_vsn_from_start_of_branch(VsnOrRefTag)};
                 nomatch ->
-                    strip_leading_v(VsnOrRefTag)
+                    {ok, strip_leading_v(VsnOrRefTag)}
             end;
         _ ->
             {error, {invalid_result, Result}}
@@ -60,7 +60,7 @@ vsn(Glob) ->
 %%%===================================================================
 %%% Internal Functions
 %%%===================================================================
--spec strip_leading_v(io_lib:chars()) -> string().
+-spec strip_leading_v(io_lib:chars()) -> binary().
 strip_leading_v(Vsn) ->
     case re:run(Vsn, "v?(.+)", [{capture, [1], binary}]) of
         {match, [NVsn]} ->
