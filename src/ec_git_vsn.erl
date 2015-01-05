@@ -34,7 +34,7 @@
 new() ->
     "*".
 
--spec vsn(t()) -> {ok, string()} | {error, Reason::any()}.
+-spec vsn(t()) -> {ok, binary()} | {error, Reason::any()}.
 vsn([]) ->
     vsn("*");
 vsn(Glob) ->
@@ -60,16 +60,16 @@ vsn(Glob) ->
 %%%===================================================================
 %%% Internal Functions
 %%%===================================================================
--spec strip_leading_v(string()) -> string().
+-spec strip_leading_v(io_lib:chars()) -> string().
 strip_leading_v(Vsn) ->
     case re:run(Vsn, "v?(.+)", [{capture, [1], binary}]) of
         {match, [NVsn]} ->
             NVsn;
         _ ->
-            Vsn
+            iolist_to_binary(Vsn)
     end.
 
--spec find_vsn_from_start_of_branch(string()) -> string().
+-spec find_vsn_from_start_of_branch(string()) -> io_lib:chars().
 find_vsn_from_start_of_branch(RefTag) ->
     Count = do_cmd("git rev-list HEAD --count"),
     erlang:iolist_to_binary(["0.0.0+build.", Count, ".ref.", RefTag]).

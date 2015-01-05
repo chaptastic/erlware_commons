@@ -30,7 +30,7 @@
 -ifdef(have_callback_support).
 
 -callback new() -> any().
--callback vsn(any()) -> {ok, string()} | {error, Reason::any()}.
+-callback vsn(any()) -> {ok, binary()} | {error, Reason::any()}.
 
 -else.
 
